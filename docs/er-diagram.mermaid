@@ -1,0 +1,128 @@
+erDiagram
+    ADMINS ||--o{ USERS : manages
+    USERS ||--|| WALLETS : has
+    USERS ||--o{ WITHDRAWALS : requests
+    USERS ||--o{ DAILY_REWARDS : receives
+    USERS ||--o{ REWARD_HISTORY : earns
+    USERS ||--o{ COIN_HISTORY : has
+    USERS ||--o{ NOTIFICATIONS : receives
+    USERS ||--o{ REFERRALS : refers
+    ADMINS ||--o{ WITHDRAWALS : processes
+    ADMINS ||--o{ COIN_HISTORY : adjusts
+    ADMINS ||--o{ SETTINGS : updates
+
+    ADMINS {
+        bigint id PK
+        varchar admin_login_id UK
+        varchar name
+        varchar password_hash
+        enum role
+        tinyint is_active
+        datetime last_login_at
+    }
+
+    USERS {
+        bigint id PK
+        varchar login_id UK
+        varchar password_hash
+        varchar full_name
+        varchar email
+        varchar phone
+        varchar referral_code UK
+        bigint referred_by FK
+        enum verification_status
+        datetime verified_at
+        bigint verified_by FK
+        tinyint is_blocked
+        bigint created_by FK
+        datetime last_login_at
+    }
+
+    WALLETS {
+        bigint id PK
+        bigint user_id FK
+        bigint total_coins
+        decimal total_earnings_inr
+        decimal total_withdrawn_inr
+    }
+
+    DAILY_REWARDS {
+        bigint id PK
+        bigint user_id FK
+        date reward_date
+        int coins_awarded
+    }
+
+    REWARD_HISTORY {
+        bigint id PK
+        bigint user_id FK
+        enum reward_type
+        int coins
+        varchar description
+        bigint reference_id
+    }
+
+    COIN_HISTORY {
+        bigint id PK
+        bigint user_id FK
+        int change_amount
+        bigint balance_after
+        enum reason
+        bigint performed_by_admin_id FK
+    }
+
+    WITHDRAWALS {
+        bigint id PK
+        bigint user_id FK
+        varchar upi_id
+        decimal amount_inr
+        bigint coins_deducted
+        enum status
+        bigint processed_by FK
+        datetime requested_at
+        datetime processed_at
+    }
+
+    REFERRALS {
+        bigint id PK
+        bigint referrer_id FK
+        bigint referred_id FK
+        enum status
+        int coins_awarded
+        datetime completed_at
+    }
+
+    SETTINGS {
+        bigint id PK
+        varchar setting_key UK
+        text setting_value
+        bigint updated_by FK
+    }
+
+    NOTIFICATIONS {
+        bigint id PK
+        bigint user_id FK
+        varchar title
+        varchar message
+        enum type
+        tinyint is_read
+    }
+
+    AUDIT_LOGS {
+        bigint id PK
+        enum actor_type
+        bigint actor_id
+        varchar action
+        varchar target_type
+        bigint target_id
+        json details
+    }
+
+    REFRESH_TOKENS {
+        bigint id PK
+        enum owner_type
+        bigint owner_id
+        varchar token_hash UK
+        datetime expires_at
+        datetime revoked_at
+    }
